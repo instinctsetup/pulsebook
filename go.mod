@@ -1,3 +1,3 @@
 module github.com/instinctsetup/pulsebook
 
-go 1.26.6
+go 1.23

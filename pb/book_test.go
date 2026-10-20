@@ -1,6 +1,7 @@
 package pb
 
 import (
+	"sync"
 	"testing"
 )
 
@@ -208,4 +209,40 @@ func TestInvariantFuzz(t *testing.T) {
 	}
 	t.Logf("fuzz done: %d orders, %d trades, %d resting",
 		b.Stats()["orders_added"], b.Stats()["trades"], b.Stats()["resting"])
+}
+
+func TestConcurrentAddCancel(t *testing.T) {
+	b := NewBook()
+	var wg sync.WaitGroup
+	for g := 0; g < 8; g++ {
+		wg.Add(1)
+		go func(base uint64) {
+			defer wg.Done()
+			for i := uint64(1); i <= 2000; i++ {
+				id := base*10000 + i
+				side := Buy
+				if i%2 == 0 {
+					side = Sell
+				}
+				b.AddLimit(id, side, 100_00+int64(i%50), 10)
+				if i%5 == 0 {
+					b.Cancel(id)
+				}
+			}
+		}(uint64(g))
+	}
+	wg.Wait()
+	if err := b.CheckInvariants(); err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestDuplicateIDRejected(t *testing.T) {
+	b := NewBook()
+	if _, err := b.AddLimit(1, Buy, 100_00, 10); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := b.AddLimit(1, Sell, 101_00, 10); err != ErrDuplicateID {
+		t.Fatalf("want ErrDuplicateID, got %v", err)
+	}
 }

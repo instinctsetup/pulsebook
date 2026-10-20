@@ -29,10 +29,11 @@ func (s Side) String() string {
 }
 
 var (
-	ErrNoOrder   = errors.New("order not found")
-	ErrBadQty    = errors.New("quantity must be > 0")
-	ErrBadPrice  = errors.New("limit price must be > 0")
-	ErrCrossSelf = errors.New("order would cross itself")
+	ErrNoOrder     = errors.New("order not found")
+	ErrBadQty      = errors.New("quantity must be > 0")
+	ErrBadPrice    = errors.New("limit price must be > 0")
+	ErrCrossSelf   = errors.New("order would cross itself")
+	ErrDuplicateID = errors.New("order id already resting")
 )
 
 // Order is one resting or incoming order. Price is in ticks (e.g. 0.01 USDT
@@ -102,6 +103,9 @@ func (b *Book) AddLimit(id uint64, side Side, price, qty int64) ([]Trade, error)
 	}
 	b.mu.Lock()
 	defer b.mu.Unlock()
+	if _, exists := b.orders[id]; exists {
+		return nil, ErrDuplicateID
+	}
 	o := &Order{ID: id, Side: side, Price: price, Qty: qty, Time: b.nextSeq()}
 	trades := b.matchLocked(o, price)
 	if o.Qty > 0 {
@@ -119,6 +123,9 @@ func (b *Book) AddMarket(id uint64, side Side, qty int64) ([]Trade, error) {
 	}
 	b.mu.Lock()
 	defer b.mu.Unlock()
+	if _, exists := b.orders[id]; exists {
+		return nil, ErrDuplicateID
+	}
 	limit := int64(1) << 62 // effectively infinite
 	if side == Sell {
 		limit = 0

@@ -6,6 +6,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"sync/atomic"
 )
 
 // BinanceAggTrade is one row of the public Binance aggTrades dump
@@ -71,14 +72,12 @@ func ReplayBinance(b *Book, rows []BinanceAggTrade, tick float64, qtyScale float
 	mid0 := int64(rows[0].Price / tick)
 	// seed: 50 levels deep on both sides, ~0.05 BTC per level
 	for i := int64(1); i <= 50; i++ {
-		if _, err := b.AddLimit(*nextID, Buy, mid0-i, int64(0.05/qtyScale)); err != nil {
+		if _, err := b.AddLimit(atomic.AddUint64(nextID, 1), Buy, mid0-i, int64(0.05/qtyScale)); err != nil {
 			return 0, err
 		}
-		*nextID++
-		if _, err := b.AddLimit(*nextID, Sell, mid0+i, int64(0.05/qtyScale)); err != nil {
+		if _, err := b.AddLimit(atomic.AddUint64(nextID, 1), Sell, mid0+i, int64(0.05/qtyScale)); err != nil {
 			return 0, err
 		}
-		*nextID++
 	}
 	exec := 0
 	for _, r := range rows {
@@ -90,12 +89,11 @@ func ReplayBinance(b *Book, rows []BinanceAggTrade, tick float64, qtyScale float
 		if r.IsBuyerMaker {
 			side = Sell // aggressor sold
 		}
-		tr, err := b.AddMarket(*nextID, side, qty)
+		tr, err := b.AddMarket(atomic.AddUint64(nextID, 1), side, qty)
 		if err != nil {
 			return exec, err
 		}
 		exec += len(tr)
-		*nextID++
 		// market-maker refill: keep ~1 BTC of liquidity visible in the top 3
 		// levels per side. Refill at the current mid offsets, so liquidity
 		// tracks the market instead of stacking on one stale price.
@@ -105,16 +103,14 @@ func ReplayBinance(b *Book, rows []BinanceAggTrade, tick float64, qtyScale float
 		if len(bids) == 0 && len(asks) > 0 {
 			ref := asks[0].Price - 10
 			for j := int64(1); j <= 10; j++ {
-				b.AddLimit(*nextID, Buy, ref-j, int64(0.05/qtyScale))
-				*nextID++
+				b.AddLimit(atomic.AddUint64(nextID, 1), Buy, ref-j, int64(0.05/qtyScale))
 			}
 			bids, asks = b.Depth(3)
 		}
 		if len(asks) == 0 && len(bids) > 0 {
 			ref := bids[0].Price + 10
 			for j := int64(1); j <= 10; j++ {
-				b.AddLimit(*nextID, Sell, ref+j, int64(0.05/qtyScale))
-				*nextID++
+				b.AddLimit(atomic.AddUint64(nextID, 1), Sell, ref+j, int64(0.05/qtyScale))
 			}
 			bids, asks = b.Depth(3)
 		}
@@ -131,14 +127,12 @@ func ReplayBinance(b *Book, rows []BinanceAggTrade, tick float64, qtyScale float
 			for i := int64(1); i <= 3; i++ {
 				if bq < target {
 					q := int64(0.02 / qtyScale)
-					b.AddLimit(*nextID, Buy, mid-i*2, q)
-					*nextID++
+					b.AddLimit(atomic.AddUint64(nextID, 1), Buy, mid-i*2, q)
 					bq += q
 				}
 				if aq < target {
 					q := int64(0.02 / qtyScale)
-					b.AddLimit(*nextID, Sell, mid+i*2, q)
-					*nextID++
+					b.AddLimit(atomic.AddUint64(nextID, 1), Sell, mid+i*2, q)
 					aq += q
 				}
 			}
