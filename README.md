@@ -5,8 +5,8 @@ the same matching model Binance, NYSE and every modern exchange run - in Go,
 with fixed-point integer prices (no floating point near money), validated
 against real Binance BTCUSDT order flow.
 
-**Demo video:** see `demo/pulsebook-demo.mp4` (Drive mirror linked below)
-**Report:** `docs/report/REPORT.pdf`
+**Demo video:** https://drive.google.com/file/d/1QfoB_PP_GVi3r9ZcxJPFUFAyZtqXQWK9/view (also in `demo/pulsebook-demo.mp4`)
+**Report (PDF):** https://drive.google.com/file/d/1LGxWL8pPvRA3xP1T8ZDaJ55KxxdNbc84/view (also in `docs/report/REPORT.pdf`)
 
 ![dashboard](docs/dashboard.png)
 
