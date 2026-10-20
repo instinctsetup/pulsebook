@@ -1,0 +1,27 @@
+:root { --bg:#0d1117; --panel:#161b22; --border:#30363d; --fg:#e6edf3; --dim:#8b949e; --buy:#3fb950; --sell:#f85149; --acc:#58a6ff; }
+* { box-sizing: border-box; }
+body { margin:0; background:var(--bg); color:var(--fg); font-family:-apple-system,'Segoe UI',Roboto,sans-serif; }
+main { max-width:1060px; margin:0 auto; padding:28px 20px 60px; }
+header h1 { margin:0; font-size:30px; }
+.sub { color:var(--dim); margin:4px 0 22px; }
+.cards { display:grid; grid-template-columns:repeat(6,1fr); gap:12px; margin-bottom:20px; }
+.card { background:var(--panel); border:1px solid var(--border); border-radius:10px; padding:14px; }
+.num { font-size:22px; font-weight:700; color:var(--acc); font-variant-numeric:tabular-nums; }
+.lbl { font-size:10px; letter-spacing:1px; color:var(--dim); margin-top:4px; }
+.actions { display:flex; flex-direction:column; gap:8px; align-items:stretch; justify-content:center; }
+.cols { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+.panel { background:var(--panel); border:1px solid var(--border); border-radius:10px; padding:16px; }
+h2 { font-size:11px; letter-spacing:1.5px; color:var(--dim); margin:0 0 12px; }
+.lvl { position:relative; display:flex; justify-content:space-between; font-size:13px; padding:3px 8px; font-variant-numeric:tabular-nums; border-radius:4px; margin:1px 0; overflow:hidden; }
+.lvl .depthbar { position:absolute; top:0; bottom:0; right:0; opacity:0.18; }
+.lvl span { position:relative; }
+.asks .lvl { color:var(--sell); } .asks .depthbar { background:var(--sell); }
+.bids .lvl { color:var(--buy); } .bids .depthbar { background:var(--buy); }
+.spread { text-align:center; padding:6px; color:var(--dim); font-size:13px; border-top:1px dashed var(--border); border-bottom:1px dashed var(--border); margin:4px 0; }
+.tr { display:flex; justify-content:space-between; font-size:13px; padding:3px 8px; font-variant-numeric:tabular-nums; }
+.tr.buy { color:var(--buy); } .tr.sell { color:var(--sell); }
+.row { display:flex; gap:8px; }
+input, select { background:#0d1117; border:1px solid var(--border); border-radius:8px; color:var(--fg); padding:8px 10px; font-size:14px; width:100%; }
+button { background:#21262d; border:1px solid var(--border); color:var(--fg); border-radius:8px; padding:8px 14px; cursor:pointer; font-size:13px; }
+button:hover { border-color:var(--acc); }
+button.primary { background:var(--acc); border-color:var(--acc); color:#0d1117; font-weight:600; }

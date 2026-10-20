@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>pulsebook</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main>
+  <header>
+    <h1>📈 pulsebook</h1>
+    <p class="sub">limit-order-book matching engine - strict price-time priority, fixed-point ticks, real Binance replay</p>
+  </header>
+
+  <section class="cards">
+    <div class="card"><div class="num" id="c-orders">0</div><div class="lbl">ORDERS IN</div></div>
+    <div class="card"><div class="num" id="c-trades">0</div><div class="lbl">TRADES</div></div>
+    <div class="card"><div class="num" id="c-vol">0</div><div class="lbl">LOTS MATCHED</div></div>
+    <div class="card"><div class="num" id="c-rest">0</div><div class="lbl">RESTING</div></div>
+    <div class="card"><div class="num" id="c-lat">-</div><div class="lbl">LAST OP NS</div></div>
+    <div class="card actions">
+      <button id="btn-seed">Seed ladder</button>
+      <button id="btn-replay" class="primary">▶ Replay real Binance flow</button>
+    </div>
+  </section>
+
+  <section class="cols">
+    <div class="panel">
+      <h2>ORDER BOOK (top 12)</h2>
+      <div class="ladder">
+        <div id="asks" class="side asks"></div>
+        <div id="spread" class="spread">-</div>
+        <div id="bids" class="side bids"></div>
+      </div>
+    </div>
+    <div class="panel">
+      <h2>RECENT TRADES</h2>
+      <div id="trades"></div>
+      <h2 style="margin-top:16px">SEND ORDER</h2>
+      <div class="row">
+        <select id="o-side"><option value="buy">buy</option><option value="sell">sell</option></select>
+        <select id="o-type"><option value="limit">limit</option><option value="market">market</option></select>
+        <input id="o-price" type="number" placeholder="price (ticks)" value="8200000">
+        <input id="o-qty" type="number" placeholder="qty (lots)" value="5000">
+        <button id="btn-send" class="primary">Send</button>
+      </div>
+    </div>
+  </section>
+</main>
+<script src="app.js"></script>
+</body>
+</html>
